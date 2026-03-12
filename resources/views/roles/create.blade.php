@@ -5,10 +5,10 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4 sm:py-6 lg:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
+                <div class="p-4 sm:p-6">
                     <form method="POST" action="{{ route('roles.store') }}">
                         @csrf
 
@@ -22,7 +22,7 @@
                         <!-- Permisos -->
                         <div class="mb-4">
                             <x-input-label :value="__('Permisos')" />
-                            <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                            <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-48 sm:max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4">
                                 @foreach ($permissions as $permission)
                                     <label class="flex items-center">
                                         <input type="checkbox" name="permissions[]" value="{{ $permission->name }}"
@@ -34,9 +34,9 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-4">
-                            <x-primary-button>{{ __('Crear Rol') }}</x-primary-button>
-                            <a href="{{ route('roles.index') }}" class="text-gray-600 hover:text-gray-900">{{ __('Cancelar') }}</a>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                            <x-primary-button class="w-full sm:w-auto justify-center">{{ __('Crear Rol') }}</x-primary-button>
+                            <a href="{{ route('roles.index') }}" class="text-center text-gray-600 hover:text-gray-900 sm:inline">{{ __('Cancelar') }}</a>
                         </div>
                     </form>
                 </div>
