@@ -1,4 +1,4 @@
-<div x-data="{ sidebarOpen: true, adminOpen: {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'true' : 'false' }}, mobileMenuOpen: false }" class="flex h-screen bg-slate-100 overflow-hidden">
+<div x-data="{ sidebarOpen: true, adminOpen: {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'true' : 'false' }}, catalogosOpen: {{ request()->routeIs('divisiones.*') || request()->routeIs('unidades-negocio.*') || request()->routeIs('direcciones.*') || request()->routeIs('gerencias.*') || request()->routeIs('areas.*') || request()->routeIs('puestos.*') ? 'true' : 'false' }}, mobileMenuOpen: false }" class="flex h-screen bg-slate-100 overflow-hidden">
     <!-- Botón menú móvil -->
     <button @click="mobileMenuOpen = true" class="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-slate-800 text-white shadow-lg hover:bg-slate-700 transition-colors">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,6 +96,55 @@
                     </div>
                 </div>
             @endif
+
+            <!-- Catálogos - Estructura Organizacional -->
+            <div>
+                <button @click="catalogosOpen = ! catalogosOpen" class="flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg font-medium transition-all duration-200
+                    {{ request()->routeIs('divisiones.*') || request()->routeIs('unidades-negocio.*') || request()->routeIs('direcciones.*') || request()->routeIs('gerencias.*') || request()->routeIs('areas.*') || request()->routeIs('puestos.*') ? 'bg-slate-700/50 text-white' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
+                    <span class="flex items-center gap-3 min-w-0">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        <span x-show="sidebarOpen" x-transition class="whitespace-nowrap overflow-hidden">{{ __('Catálogos') }}</span>
+                    </span>
+                    <svg x-show="sidebarOpen" class="w-4 h-4 shrink-0 transition-transform duration-200" :class="{ 'rotate-180': catalogosOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div x-show="catalogosOpen"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     class="overflow-hidden">
+                    <div class="pl-4 mt-1 space-y-0.5 border-l border-slate-600/50 ml-5">
+                        <a href="{{ route('divisiones.index') }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                            {{ request()->routeIs('divisiones.*') ? 'bg-slate-600/80 text-white' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                            <span x-show="sidebarOpen" x-transition>{{ __('Divisiones') }}</span>
+                        </a>
+                        <a href="{{ route('unidades-negocio.index') }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                            {{ request()->routeIs('unidades-negocio.*') ? 'bg-slate-600/80 text-white' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                            <span x-show="sidebarOpen" x-transition>{{ __('Unidades de Negocio') }}</span>
+                        </a>
+                        <a href="{{ route('direcciones.index') }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                            {{ request()->routeIs('direcciones.*') ? 'bg-slate-600/80 text-white' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                            <span x-show="sidebarOpen" x-transition>{{ __('Direcciones') }}</span>
+                        </a>
+                        <a href="{{ route('gerencias.index') }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                            {{ request()->routeIs('gerencias.*') ? 'bg-slate-600/80 text-white' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                            <span x-show="sidebarOpen" x-transition>{{ __('Gerencias') }}</span>
+                        </a>
+                        <a href="{{ route('areas.index') }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                            {{ request()->routeIs('areas.*') ? 'bg-slate-600/80 text-white' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                            <span x-show="sidebarOpen" x-transition>{{ __('Áreas') }}</span>
+                        </a>
+                        <a href="{{ route('puestos.index') }}" @click="mobileMenuOpen = false" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                            {{ request()->routeIs('puestos.*') ? 'bg-slate-600/80 text-white' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                            <span x-show="sidebarOpen" x-transition>{{ __('Puestos') }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </nav>
 
         <!-- Usuario - Parte inferior -->
