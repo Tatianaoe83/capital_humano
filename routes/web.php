@@ -10,6 +10,7 @@ use App\Http\Controllers\DireccionController;
 use App\Http\Controllers\GerenciaController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\PuestoController;
+use App\Http\Controllers\EmpleadoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -41,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('gerencias', GerenciaController::class);
     Route::resource('areas', AreaController::class);
     Route::resource('puestos', PuestoController::class);
+
+    // Empleados
+    Route::resource('empleados', EmpleadoController::class)->except(['show']);
 });
 
 require __DIR__.'/auth.php';
