@@ -15,11 +15,7 @@
 
     <div class="py-4 sm:py-6 lg:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            @if (session('status'))
-                <div class="mb-4 px-4 py-3 rounded-lg bg-green-100 text-green-800 text-sm sm:text-base">
-                    {{ session('status') }}
-                </div>
-            @endif
+            @include('catalogos.partials.messages')
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-4 sm:p-6">

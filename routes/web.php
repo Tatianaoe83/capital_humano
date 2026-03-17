@@ -44,7 +44,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('puestos', PuestoController::class);
 
     // Empleados
-    Route::resource('empleados', EmpleadoController::class)->except(['show']);
+    Route::patch('empleados/{empleado}/toggle-baja', [EmpleadoController::class, 'toggleBaja'])->name('empleados.toggle-baja');
+    Route::post('empleados/{empleado}/documentos', [EmpleadoController::class, 'storeDocument'])->name('empleados.documentos.store');
+    Route::get('empleados/{empleado}/documentos/{documento}/descargar', [EmpleadoController::class, 'downloadDocument'])->name('empleados.documentos.download');
+    Route::delete('empleados/{empleado}/documentos/{documento}', [EmpleadoController::class, 'destroyDocument'])->name('empleados.documentos.destroy');
+    Route::resource('empleados', EmpleadoController::class);
 });
 
 require __DIR__.'/auth.php';

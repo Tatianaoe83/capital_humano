@@ -38,12 +38,14 @@ class Empleado extends Model
         'personal',
         'tipo_contrato',
         'numero_contacto',
+        'activo',
     ];
 
     protected $casts = [
         'fecha_ingreso' => 'date',
         'fecha_nacimiento' => 'date',
         'sindicalizado' => 'boolean',
+        'activo' => 'boolean',
     ];
 
     public function jefeInmediato(): BelongsTo
@@ -69,5 +71,10 @@ class Empleado extends Model
     public function movimientosAltaBaja(): HasMany
     {
         return $this->hasMany(EmpleadoMovimientoAltaBaja::class)->orderByDesc('fecha');
+    }
+
+    public function documentos(): HasMany
+    {
+        return $this->hasMany(EmpleadoDocumento::class)->orderByDesc('created_at');
     }
 }

@@ -2,26 +2,22 @@
     <x-slot name="header">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Editar Empleado') }}: {{ $empleado->apellido_paterno }} {{ $empleado->apellido_materno }} {{ $empleado->nombre }}
+                {{ __('Ver Empleado') }}: {{ $empleado->apellido_paterno }} {{ $empleado->apellido_materno }} {{ $empleado->nombre }}
             </h2>
-            <a href="{{ route('empleados.index') }}" class="text-sm text-gray-600 hover:text-gray-900 inline-flex items-center">
-                ← {{ __('Volver al listado') }}
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('empleados.edit', $empleado) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                    {{ __('Editar') }}
+                </a>
+                <a href="{{ route('empleados.index') }}" class="text-sm text-gray-600 hover:text-gray-900">
+                    ← {{ __('Volver al listado') }}
+                </a>
+            </div>
         </div>
     </x-slot>
 
-    <div class="py-4 sm:py-6 lg:py-8" x-data="{ tab: '{{ old('tab_activo', session('tab_activo', 'datos')) }}' }">
+    <div class="py-4 sm:py-6 lg:py-8" x-data="{ tab: '{{ session('tab_activo', 'datos') }}' }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @include('catalogos.partials.messages')
-            @if ($errors->any())
-                <div class="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-800">
-                    <ul class="list-disc pl-5 space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
 
             {{-- Pestañas --}}
             <div class="border-b border-gray-200 mb-6">
@@ -50,24 +46,19 @@
                 </nav>
             </div>
 
-            {{-- Contenido pestaña: Datos generales --}}
+            {{-- Pestaña: Datos generales (solo lectura) --}}
             <div x-show="tab === 'datos'" x-cloak class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-4 sm:p-6">
-                    <form method="POST" action="{{ route('empleados.update', $empleado) }}">
-                        @csrf
-                        @method('PUT')
-                        @include('empleados._form', ['empleado' => $empleado, 'requiredPuesto' => true])
-                        <div class="mt-6 flex gap-4">
-                            <x-primary-button>{{ __('Actualizar') }}</x-primary-button>
-                            <a href="{{ route('empleados.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">
-                                {{ __('Cancelar') }}
-                            </a>
-                        </div>
-                    </form>
+                    @include('empleados._datos_readonly', ['empleado' => $empleado])
+                    <div class="mt-6 pt-4 border-t">
+                        <a href="{{ route('empleados.edit', $empleado) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                            {{ __('Editar datos') }}
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            {{-- Contenido pestaña: Adjuntar documentos --}}
+            {{-- Pestaña: Documentos (igual que en edit) --}}
             <div x-show="tab === 'documentos'" x-cloak class="space-y-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4 sm:p-6">
@@ -92,14 +83,12 @@
                         </form>
                     </div>
                 </div>
-
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4 sm:p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Documentos adjuntos') }}</h3>
                         @if($empleado->documentos->isEmpty())
                             <div class="rounded-lg border-2 border-dashed border-gray-200 py-12 text-center">
                                 <p class="text-sm text-gray-500">{{ __('No hay documentos adjuntos.') }}</p>
-                                <p class="mt-1 text-xs text-gray-400">{{ __('Sube el primer documento con el formulario de arriba.') }}</p>
                             </div>
                         @else
                             <ul class="divide-y divide-gray-200">
@@ -138,10 +127,9 @@
                 </div>
             </div>
 
-            {{-- Contenido pestaña: Histórico (bajas y cambios de puesto) --}}
+            {{-- Pestaña: Histórico --}}
             <div x-show="tab === 'historico'" x-cloak class="space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {{-- Histórico altas / bajas / reingresos --}}
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-4 sm:p-6">
                             <div class="flex items-center gap-2 mb-4">
@@ -152,7 +140,6 @@
                                 </div>
                                 <h3 class="text-lg font-semibold text-gray-900">{{ __('Altas, bajas y reingresos') }}</h3>
                             </div>
-                            <p class="text-sm text-gray-500 mb-4">{{ __('Eventos de alta, baja y reingreso del empleado.') }}</p>
                             @if ($empleado->movimientosAltaBaja->isEmpty())
                                 <div class="rounded-lg border-2 border-dashed border-gray-200 py-8 text-center text-sm text-gray-500">
                                     {{ __('Sin movimientos registrados.') }}
@@ -161,29 +148,19 @@
                                 <div class="space-y-3">
                                     @foreach ($empleado->movimientosAltaBaja as $mov)
                                         <div class="rounded-lg border border-gray-200 bg-gray-50/50 p-4">
-                                            <div class="flex items-start justify-between gap-2">
-                                                <div>
-                                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                                                        @if($mov->tipo === 'ALTA') bg-green-100 text-green-800
-                                                        @elseif($mov->tipo === 'BAJA') bg-red-100 text-red-800
-                                                        @else bg-blue-100 text-blue-800
-                                                        @endif">
-                                                        {{ $mov->tipo }}
-                                                    </span>
-                                                    <p class="mt-1 text-sm font-medium text-gray-900">{{ $mov->fecha?->format('d/m/Y') ?? '—' }}</p>
-                                                    @if($mov->motivo)
-                                                        <p class="mt-0.5 text-sm text-gray-600">{{ $mov->motivo }}</p>
-                                                    @endif
-                                                </div>
-                                            </div>
+                                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+                                                @if($mov->tipo === 'ALTA') bg-green-100 text-green-800
+                                                @elseif($mov->tipo === 'BAJA') bg-red-100 text-red-800
+                                                @else bg-blue-100 text-blue-800
+                                                @endif">{{ $mov->tipo }}</span>
+                                            <p class="mt-1 text-sm font-medium text-gray-900">{{ $mov->fecha?->format('d/m/Y') ?? '—' }}</p>
+                                            @if($mov->motivo)<p class="mt-0.5 text-sm text-gray-600">{{ $mov->motivo }}</p>@endif
                                         </div>
                                     @endforeach
                                 </div>
                             @endif
                         </div>
                     </div>
-
-                    {{-- Histórico cambios de puesto --}}
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-4 sm:p-6">
                             <div class="flex items-center gap-2 mb-4">
@@ -194,7 +171,6 @@
                                 </div>
                                 <h3 class="text-lg font-semibold text-gray-900">{{ __('Cambios de puesto') }}</h3>
                             </div>
-                            <p class="text-sm text-gray-500 mb-4">{{ __('Historial de cambios de puesto y área.') }}</p>
                             @if ($empleado->movimientosPuesto->isEmpty())
                                 <div class="rounded-lg border-2 border-dashed border-gray-200 py-8 text-center text-sm text-gray-500">
                                     {{ __('Sin movimientos registrados.') }}
@@ -203,17 +179,9 @@
                                 <div class="space-y-3">
                                     @foreach ($empleado->movimientosPuesto as $mov)
                                         <div class="rounded-lg border border-gray-200 bg-gray-50/50 p-4">
-                                            <div class="flex items-start justify-between gap-2">
-                                                <div>
-                                                    <p class="text-sm font-medium text-gray-900">
-                                                        {{ $mov->puesto?->area?->nombre ?? '—' }} · {{ $mov->puesto?->nombre ?? '—' }}
-                                                    </p>
-                                                    <p class="text-xs text-gray-500 mt-0.5">{{ $mov->fecha_movimiento?->format('d/m/Y') ?? '—' }}</p>
-                                                    @if($mov->observaciones)
-                                                        <p class="mt-1 text-sm text-gray-600">{{ $mov->observaciones }}</p>
-                                                    @endif
-                                                </div>
-                                            </div>
+                                            <p class="text-sm font-medium text-gray-900">{{ $mov->puesto?->area?->nombre ?? '—' }} · {{ $mov->puesto?->nombre ?? '—' }}</p>
+                                            <p class="text-xs text-gray-500 mt-0.5">{{ $mov->fecha_movimiento?->format('d/m/Y') ?? '—' }}</p>
+                                            @if($mov->observaciones)<p class="mt-1 text-sm text-gray-600">{{ $mov->observaciones }}</p>@endif
                                         </div>
                                     @endforeach
                                 </div>
@@ -224,8 +192,5 @@
             </div>
         </div>
     </div>
-
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
+    <style>[x-cloak] { display: none !important; }</style>
 </x-app-layout>
