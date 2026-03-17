@@ -22,4 +22,9 @@ class Puesto extends Model
     {
         return $this->belongsTo(Area::class, 'area_id');
     }
+
+    public function empleados(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Empleado::class, 'puesto_id');
+    }
 }

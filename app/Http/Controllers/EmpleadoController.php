@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empleado;
+use App\Models\EmpleadoMovimientoPuesto;
+use App\Models\Puesto;
 use Illuminate\Http\Request;
 
 class EmpleadoController extends Controller
 {
     public function index(Request $request)
     {
-        $empleados = Empleado::with('jefeInmediato')
+        $empleados = Empleado::with('jefeInmediato', 'puesto.area')
             ->orderBy('apellido_paterno')
             ->orderBy('apellido_materno')
             ->orderBy('nombre')
@@ -21,8 +23,9 @@ class EmpleadoController extends Controller
     public function create()
     {
         $empleados = Empleado::orderBy('apellido_paterno')->orderBy('nombre')->get();
+        $puestos = Puesto::with('area.direccion.unidadNegocio', 'area.gerencia')->where('activo', true)->orderBy('nombre')->get();
 
-        return view('empleados.create', compact('empleados'));
+        return view('empleados.create', compact('empleados', 'puestos'));
     }
 
     public function store(Request $request)
@@ -32,6 +35,7 @@ class EmpleadoController extends Controller
             'apellido_materno' => ['nullable', 'string', 'max:255'],
             'nombre' => ['required', 'string', 'max:255'],
             'fecha_ingreso' => ['required', 'date'],
+            'puesto_id' => ['required', 'exists:puestos,id'],
             'jefe_inmediato_id' => ['nullable', 'exists:empleados,id'],
             'sindicalizado' => ['nullable', 'boolean'],
             'tipo_prestacion' => ['nullable', 'string', 'max:255'],
@@ -67,8 +71,11 @@ class EmpleadoController extends Controller
             ->orderBy('apellido_paterno')
             ->orderBy('nombre')
             ->get();
+        $puestos = Puesto::with('area.direccion.unidadNegocio', 'area.gerencia')->where('activo', true)->orderBy('nombre')->get();
 
-        return view('empleados.edit', compact('empleado', 'empleados'));
+        $empleado->load('movimientosPuesto.puesto.area', 'movimientosAltaBaja');
+
+        return view('empleados.edit', compact('empleado', 'empleados', 'puestos'));
     }
 
     public function update(Request $request, Empleado $empleado)
@@ -78,6 +85,7 @@ class EmpleadoController extends Controller
             'apellido_materno' => ['nullable', 'string', 'max:255'],
             'nombre' => ['required', 'string', 'max:255'],
             'fecha_ingreso' => ['required', 'date'],
+            'puesto_id' => ['required', 'exists:puestos,id'],
             'jefe_inmediato_id' => ['nullable', 'exists:empleados,id'],
             'sindicalizado' => ['nullable', 'boolean'],
             'tipo_prestacion' => ['nullable', 'string', 'max:255'],
@@ -100,6 +108,23 @@ class EmpleadoController extends Controller
         ]);
 
         $validated['sindicalizado'] = $request->boolean('sindicalizado', false);
+
+        $puestoAnteriorId = $empleado->puesto_id;
+        $nuevoPuestoId = (int) $validated['puesto_id'];
+
+        if ($puestoAnteriorId !== $nuevoPuestoId) {
+            $puestoAnterior = $empleado->puesto;
+            $observaciones = $puestoAnterior
+                ? __('Cambio desde: :puesto', ['puesto' => $puestoAnterior->nombre])
+                : null;
+
+            EmpleadoMovimientoPuesto::create([
+                'empleado_id' => $empleado->id,
+                'puesto_id' => $nuevoPuestoId,
+                'fecha_movimiento' => now(),
+                'observaciones' => $observaciones,
+            ]);
+        }
 
         $empleado->update($validated);
 

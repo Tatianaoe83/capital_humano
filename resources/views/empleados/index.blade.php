@@ -22,6 +22,7 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nombre completo') }}</th>
+                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Puesto') }}</th>
                                     <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Jefe inmediato') }}</th>
                                     <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Fecha ingreso') }}</th>
                                     <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Acciones') }}</th>
@@ -32,6 +33,9 @@
                                     <tr>
                                         <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                             {{ $e->apellido_paterno }} {{ $e->apellido_materno }} {{ $e->nombre }}
+                                        </td>
+                                        <td class="px-4 sm:px-6 py-4 text-sm text-gray-500">
+                                            {{ $e->puesto?->nombre ?? '—' }}
                                         </td>
                                         <td class="px-4 sm:px-6 py-4 text-sm text-gray-500">
                                             {{ $e->jefeInmediato ? $e->jefeInmediato->apellido_paterno . ' ' . $e->jefeInmediato->apellido_materno . ' ' . $e->jefeInmediato->nombre : '—' }}
@@ -50,7 +54,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-4 sm:px-6 py-8 text-center text-gray-500">{{ __('No hay empleados registrados.') }}</td>
+                                        <td colspan="5" class="px-4 sm:px-6 py-8 text-center text-gray-500">{{ __('No hay empleados registrados.') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>

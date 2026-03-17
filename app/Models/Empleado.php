@@ -19,6 +19,7 @@ class Empleado extends Model
         'nombre',
         'fecha_ingreso',
         'jefe_inmediato_id',
+        'puesto_id',
         'sindicalizado',
         'tipo_prestacion',
         'ubicacion',
@@ -50,8 +51,23 @@ class Empleado extends Model
         return $this->belongsTo(Empleado::class, 'jefe_inmediato_id');
     }
 
+    public function puesto(): BelongsTo
+    {
+        return $this->belongsTo(Puesto::class);
+    }
+
     public function subordinados(): HasMany
     {
         return $this->hasMany(Empleado::class, 'jefe_inmediato_id');
+    }
+
+    public function movimientosPuesto(): HasMany
+    {
+        return $this->hasMany(EmpleadoMovimientoPuesto::class)->orderByDesc('fecha_movimiento');
+    }
+
+    public function movimientosAltaBaja(): HasMany
+    {
+        return $this->hasMany(EmpleadoMovimientoAltaBaja::class)->orderByDesc('fecha');
     }
 }

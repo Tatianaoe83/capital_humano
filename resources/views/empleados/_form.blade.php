@@ -2,6 +2,8 @@
 
 @php
     $empleados = $empleados ?? collect();
+    $puestos = $puestos ?? collect();
+    $requiredPuesto = $requiredPuesto ?? false;
 @endphp
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -56,6 +58,18 @@
     <div class="space-y-4">
         <h3 class="text-sm font-semibold text-gray-700 border-b pb-2">{{ __('Datos laborales') }}</h3>
         <div class="space-y-4">
+            <div>
+                <x-input-label for="puesto_id" :value="__('Puesto')" />
+                <select id="puesto_id" name="puesto_id" {{ $requiredPuesto ? 'required' : '' }} class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">{{ __('Seleccione...') }}</option>
+                    @foreach ($puestos as $p)
+                        <option value="{{ $p->id }}" {{ old('puesto_id', $empleado?->puesto_id) == $p->id ? 'selected' : '' }}>
+                            {{ $p->area->nombre ?? '' }} - {{ $p->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+                <x-input-error :messages="$errors->get('puesto_id')" class="mt-1" />
+            </div>
             <div>
                 <x-input-label for="fecha_ingreso" :value="__('Fecha de ingreso')" />
                 <x-text-input id="fecha_ingreso" name="fecha_ingreso" type="date" :value="old('fecha_ingreso', $empleado?->fecha_ingreso?->format('Y-m-d'))" required />

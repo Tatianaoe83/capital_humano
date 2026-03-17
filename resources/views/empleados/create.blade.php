@@ -11,7 +11,7 @@
                 <div class="p-4 sm:p-6">
                     <form method="POST" action="{{ route('empleados.store') }}">
                         @csrf
-                        @include('empleados._form')
+                        @include('empleados._form', ['requiredPuesto' => true])
                         <div class="mt-6 flex gap-4">
                             <x-primary-button>{{ __('Crear') }}</x-primary-button>
                             <a href="{{ route('empleados.index') }}" class="text-gray-600 hover:text-gray-900">{{ __('Cancelar') }}</a>
