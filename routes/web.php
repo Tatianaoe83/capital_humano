@@ -11,14 +11,62 @@ use App\Http\Controllers\GerenciaController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\EmpleadoController;
+use App\Models\Area;
+use App\Models\Direccion;
+use App\Models\Division;
+use App\Models\Empleado;
+use App\Models\EmpleadoMovimientoAltaBaja;
+use App\Models\Gerencia;
+use App\Models\Puesto;
+use App\Models\UnidadNegocio;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $stats = [
+        'empleados_total' => Empleado::count(),
+        'empleados_activos' => Empleado::where('activo', true)->count(),
+        'empleados_baja' => Empleado::where('activo', false)->count(),
+        'usuarios' => User::count(),
+        'roles' => Role::count(),
+        'permisos' => Permission::count(),
+        'divisiones' => Division::count(),
+        'unidades_negocio' => UnidadNegocio::count(),
+        'direcciones' => Direccion::count(),
+        'gerencias' => Gerencia::count(),
+        'areas' => Area::count(),
+        'puestos' => Puesto::count(),
+        'puestos_activos' => Puesto::where('activo', true)->count(),
+    ];
+
+    $altasMes = EmpleadoMovimientoAltaBaja::where('tipo', EmpleadoMovimientoAltaBaja::TIPO_ALTA)
+        ->whereMonth('fecha', now()->month)
+        ->whereYear('fecha', now()->year)
+        ->count();
+
+    $bajasMes = EmpleadoMovimientoAltaBaja::where('tipo', EmpleadoMovimientoAltaBaja::TIPO_BAJA)
+        ->whereMonth('fecha', now()->month)
+        ->whereYear('fecha', now()->year)
+        ->count();
+
+    $ingresosRecientes = Empleado::with('puesto.area')
+        ->orderByDesc('fecha_ingreso')
+        ->limit(5)
+        ->get();
+
+    $movimientosRecientes = EmpleadoMovimientoAltaBaja::with('empleado.puesto')
+        ->orderByDesc('fecha')
+        ->orderByDesc('id')
+        ->limit(5)
+        ->get();
+
+    return view('dashboard', compact('stats', 'altasMes', 'bajasMes', 'ingresosRecientes', 'movimientosRecientes'));
 })->middleware(['auth', 'verified'])->name('dashboard')->can('ver-dashboard');
 
 Route::middleware('auth')->group(function () {

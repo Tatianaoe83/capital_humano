@@ -15,13 +15,7 @@ class EmpleadoController extends Controller
 {
     public function index(Request $request)
     {
-        $empleados = Empleado::with('jefeInmediato', 'puesto.area')
-            ->orderBy('apellido_paterno')
-            ->orderBy('apellido_materno')
-            ->orderBy('nombre')
-            ->paginate(10);
-
-        return view('empleados.index', compact('empleados'));
+        return view('empleados.index');
     }
 
     public function create()
