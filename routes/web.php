@@ -70,6 +70,15 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard')->can('ver-dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/estructura-organizacional', function () {
+        $divisiones = Division::with([
+            'unidadesNegocio.direcciones.gerencias.areas.puestos',
+            'unidadesNegocio.direcciones.areas.puestos',
+        ])->orderBy('nombre')->get();
+
+        return view('estructura-organizacional', compact('divisiones'));
+    })->name('estructura-organizacional');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
