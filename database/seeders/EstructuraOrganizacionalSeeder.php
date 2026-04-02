@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Area;
+use App\Models\CentroCosto;
 use App\Models\Direccion;
 use App\Models\Division;
 use App\Models\Gerencia;
@@ -37,6 +38,11 @@ class EstructuraOrganizacionalSeeder extends Seeder
                 'nombre' => 'DIRECCIÓN GENERAL',
             ],
             ['activo' => true]
+        );
+
+        $centroCosto = CentroCosto::firstOrCreate(
+            ['nombre' => 'G520 GERENCIA DE GASTOS COMPARTIDOS 2025'],
+            ['activo' => true, 'unidad_negocio_id' => null]
         );
 
         $gerenciaFinanzas = Gerencia::firstOrCreate(
@@ -81,5 +87,10 @@ class EstructuraOrganizacionalSeeder extends Seeder
             ['area_id' => $areaContabilidad->id, 'nombre' => 'AUXILIAR CONTABLE'],
             ['activo' => true]
         );
+
+        $centroCosto->areas()->syncWithoutDetaching([
+            $areaDireccionGeneral->id,
+            $areaContabilidad->id,
+        ]);
     }
 }

@@ -19,8 +19,8 @@
                 <form method="GET" class="flex flex-wrap gap-2">
                     <select name="unidad_negocio_id" class="rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" onchange="this.form.submit()">
                         <option value="">{{ __('Todas las unidades de negocio') }}</option>
-                        @foreach ($unidadesNegocio as $u)
-                            <option value="{{ $u->id }}" {{ request('unidad_negocio_id') == $u->id ? 'selected' : '' }}>{{ $u->division->nombre }} / {{ $u->nombre }}</option>
+                        @foreach ($unidadesNegocio as $unidad)
+                            <option value="{{ $unidad->id }}" {{ request('unidad_negocio_id') == $unidad->id ? 'selected' : '' }}>{{ $unidad->division->nombre }} / {{ $unidad->nombre }}</option>
                         @endforeach
                     </select>
                 </form>
@@ -33,6 +33,7 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Unidad de Negocio') }}</th>
+                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Centro de Costos') }}</th>
                                     <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nombre') }}</th>
                                     <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Gerencias/Áreas') }}</th>
                                     <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Estado') }}</th>
@@ -42,7 +43,7 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse ($direcciones as $dir)
                                     <tr>
-                                        <td class="px-4 sm:px-6 py-4 text-sm text-gray-500">{{ $dir->unidadNegocio->nombre }}</td>
+                                        <td class="px-4 sm:px-6 py-4 text-sm text-gray-500">{{ $dir->unidadNegocio->division->nombre }} / {{ $dir->unidadNegocio->nombre }}</td>
                                         <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $dir->nombre }}</td>
                                         <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $dir->gerencias_count + $dir->areas_count }}</td>
                                         <td class="px-4 sm:px-6 py-4 whitespace-nowrap">

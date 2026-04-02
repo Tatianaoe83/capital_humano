@@ -10,7 +10,7 @@ class DireccionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Direccion::with('unidadNegocio')->withCount(['gerencias', 'areas']);
+        $query = Direccion::with(['unidadNegocio.division'])->withCount(['gerencias', 'areas']);
 
         if ($request->filled('unidad_negocio_id')) {
             $query->where('unidad_negocio_id', $request->unidad_negocio_id);

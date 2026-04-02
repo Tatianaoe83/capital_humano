@@ -15,8 +15,8 @@
                             <x-input-label for="unidad_negocio_id" :value="__('Unidad de Negocio')" />
                             <select id="unidad_negocio_id" name="unidad_negocio_id" required class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="">{{ __('Seleccione...') }}</option>
-                                @foreach ($unidadesNegocio as $u)
-                                    <option value="{{ $u->id }}" {{ old('unidad_negocio_id') == $u->id ? 'selected' : '' }}>{{ $u->division->nombre }} / {{ $u->nombre }}</option>
+                                @foreach ($unidadesNegocio as $unidad)
+                                    <option value="{{ $unidad->id }}" {{ old('unidad_negocio_id') == $unidad->id ? 'selected' : '' }}>{{ $unidad->division->nombre }} / {{ $unidad->nombre }}</option>
                                 @endforeach
                             </select>
                             <x-input-error :messages="$errors->get('unidad_negocio_id')" class="mt-2" />

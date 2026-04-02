@@ -5,7 +5,7 @@
                 {{ __('Diagrama Interactivo de Estructura Organizacional') }}
             </h2>
             <p class="text-sm text-gray-500">
-                {{ __('Explora la jerarquía División -> Unidad de Negocio -> Dirección -> Gerencia -> Área -> Puesto.') }}
+                {{ __('Jerarquía: División → Unidad → Dirección → Gerencia → Área → Puesto. Los centros de costos se enlazan a una o más áreas.') }}
             </p>
         </div>
     </x-slot>
@@ -14,6 +14,7 @@
         $totales = [
             'divisiones' => $divisiones->count(),
             'unidades' => $divisiones->sum(fn ($division) => $division->unidadesNegocio->count()),
+            'centros_costos' => $centrosCostoTotal,
             'direcciones' => $divisiones->sum(fn ($division) => $division->unidadesNegocio->sum(fn ($unidad) => $unidad->direcciones->count())),
             'gerencias' => $divisiones->sum(fn ($division) => $division->unidadesNegocio->sum(fn ($unidad) => $unidad->direcciones->sum(fn ($direccion) => $direccion->gerencias->count()))),
             'areas' => $divisiones->sum(fn ($division) => $division->unidadesNegocio->sum(fn ($unidad) => $unidad->direcciones->sum(fn ($direccion) => $direccion->areas->count() + $direccion->gerencias->sum(fn ($gerencia) => $gerencia->areas->count())))),
@@ -81,7 +82,7 @@
                         'id' => $direccionId,
                         'label' => $direccion->nombre,
                         'group' => 'direccion',
-                        'level' => 3,
+                        'level' => 4,
                         'type' => 'Direccion',
                         'meta' => [
                             'nombre' => $direccion->nombre,
@@ -97,7 +98,7 @@
                             'id' => $areaId,
                             'label' => $area->nombre,
                             'group' => 'area',
-                            'level' => 5,
+                            'level' => 6,
                             'type' => 'Area',
                             'meta' => [
                                 'nombre' => $area->nombre,
@@ -113,7 +114,7 @@
                                 'id' => $puestoId,
                                 'label' => $puesto->nombre,
                                 'group' => 'puesto',
-                                'level' => 6,
+                                'level' => 7,
                                 'type' => 'Puesto',
                                 'meta' => [
                                     'nombre' => $puesto->nombre,
@@ -131,7 +132,7 @@
                             'id' => $gerenciaId,
                             'label' => $gerencia->nombre,
                             'group' => 'gerencia',
-                            'level' => 4,
+                            'level' => 5,
                             'type' => 'Gerencia',
                             'meta' => [
                                 'nombre' => $gerencia->nombre,
@@ -147,7 +148,7 @@
                                 'id' => $areaId,
                                 'label' => $area->nombre,
                                 'group' => 'area',
-                                'level' => 5,
+                                'level' => 6,
                                 'type' => 'Area',
                                 'meta' => [
                                     'nombre' => $area->nombre,
@@ -163,7 +164,7 @@
                                     'id' => $puestoId,
                                     'label' => $puesto->nombre,
                                     'group' => 'puesto',
-                                    'level' => 6,
+                                    'level' => 7,
                                     'type' => 'Puesto',
                                     'meta' => [
                                         'nombre' => $puesto->nombre,
@@ -174,6 +175,27 @@
                                 $pushEdge($areaId, $puestoId);
                             }
                         }
+                    }
+                }
+
+                foreach (($centrosPorUnidad[$unidad->id] ?? []) as $centroCosto) {
+                    $centroCostoId = 'centro-costo-'.$centroCosto->id;
+                    $pushNode([
+                        'id' => $centroCostoId,
+                        'label' => $centroCosto->nombre,
+                        'group' => 'centro_costo',
+                        'level' => 3,
+                        'type' => 'Centro de costos',
+                        'meta' => [
+                            'nombre' => $centroCosto->nombre,
+                            'detalle' => $centroCosto->areas->count().' áreas vinculadas',
+                            'padre' => $unidad->nombre,
+                        ],
+                    ]);
+                    $pushEdge($unidadId, $centroCostoId);
+
+                    foreach ($centroCosto->areas as $area) {
+                        $pushEdge($centroCostoId, 'area-'.$area->id);
                     }
                 }
             }
@@ -196,8 +218,8 @@
                     <p class="mt-2 text-3xl font-semibold text-slate-900">{{ $totales['direcciones'] }}</p>
                 </div>
                 <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <p class="text-sm font-medium text-slate-500">{{ __('Puestos') }}</p>
-                    <p class="mt-2 text-3xl font-semibold text-slate-900">{{ $totales['puestos'] }}</p>
+                    <p class="text-sm font-medium text-slate-500">{{ __('Centros de costos') }}</p>
+                    <p class="mt-2 text-3xl font-semibold text-slate-900">{{ $totales['centros_costos'] }}</p>
                 </div>
             </div>
 
@@ -211,7 +233,7 @@
                         <div class="flex flex-col gap-3 sm:flex-row">
                             <label class="relative block">
                                 <span class="sr-only">{{ __('Buscar nodo') }}</span>
-                                <input id="org-search" type="search" placeholder="{{ __('Buscar division, area o puesto...') }}"
+                                <input id="org-search" type="search" placeholder="{{ __('Buscar unidad, centro de costos o puesto...') }}"
                                     class="block w-full rounded-lg border-slate-300 py-2 pl-3 pr-10 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">⌕</span>
                             </label>
@@ -253,6 +275,7 @@
                         <div class="space-y-3 p-5 text-sm text-slate-600">
                             <div class="flex items-center gap-3"><span class="h-3 w-3 rounded-full bg-indigo-500"></span>{{ __('Division') }}</div>
                             <div class="flex items-center gap-3"><span class="h-3 w-3 rounded-full bg-blue-500"></span>{{ __('Unidad de negocio') }}</div>
+                            <div class="flex items-center gap-3"><span class="h-3 w-3 rounded-full bg-cyan-500"></span>{{ __('Centro de costos') }}</div>
                             <div class="flex items-center gap-3"><span class="h-3 w-3 rounded-full bg-emerald-500"></span>{{ __('Direccion') }}</div>
                             <div class="flex items-center gap-3"><span class="h-3 w-3 rounded-full bg-amber-500"></span>{{ __('Gerencia') }}</div>
                             <div class="flex items-center gap-3"><span class="h-3 w-3 rounded-full bg-slate-500"></span>{{ __('Area') }}</div>
@@ -266,12 +289,20 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3 p-5 text-sm">
                             <div class="rounded-lg bg-slate-50 p-3">
+                                <p class="text-slate-500">{{ __('Centros de costos') }}</p>
+                                <p class="mt-1 text-lg font-semibold text-slate-900">{{ $totales['centros_costos'] }}</p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
                                 <p class="text-slate-500">{{ __('Gerencias') }}</p>
                                 <p class="mt-1 text-lg font-semibold text-slate-900">{{ $totales['gerencias'] }}</p>
                             </div>
                             <div class="rounded-lg bg-slate-50 p-3">
                                 <p class="text-slate-500">{{ __('Areas') }}</p>
                                 <p class="mt-1 text-lg font-semibold text-slate-900">{{ $totales['areas'] }}</p>
+                            </div>
+                            <div class="rounded-lg bg-slate-50 p-3">
+                                <p class="text-slate-500">{{ __('Puestos') }}</p>
+                                <p class="mt-1 text-lg font-semibold text-slate-900">{{ $totales['puestos'] }}</p>
                             </div>
                             <div class="rounded-lg bg-slate-50 p-3 col-span-2">
                                 <p class="text-slate-500">{{ __('Nodos totales en el mapa') }}</p>
@@ -358,6 +389,7 @@
                 groups: {
                     division: { color: { background: '#e0e7ff', border: '#6366f1' } },
                     unidad: { color: { background: '#dbeafe', border: '#3b82f6' } },
+                    centro_costo: { color: { background: '#cffafe', border: '#06b6d4' } },
                     direccion: { color: { background: '#d1fae5', border: '#10b981' } },
                     gerencia: { color: { background: '#fef3c7', border: '#f59e0b' } },
                     area: { color: { background: '#e2e8f0', border: '#64748b' } },

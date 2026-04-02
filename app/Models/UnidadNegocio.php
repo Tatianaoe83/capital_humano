@@ -28,4 +28,9 @@ class UnidadNegocio extends Model
     {
         return $this->hasMany(Direccion::class, 'unidad_negocio_id');
     }
+
+    public function centrosCostos(): HasMany
+    {
+        return $this->hasMany(CentroCosto::class, 'unidad_negocio_id');
+    }
 }

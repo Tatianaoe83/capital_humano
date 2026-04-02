@@ -1,17 +1,19 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\DivisionController;
-use App\Http\Controllers\UnidadNegocioController;
-use App\Http\Controllers\DireccionController;
-use App\Http\Controllers\GerenciaController;
 use App\Http\Controllers\AreaController;
-use App\Http\Controllers\PuestoController;
+use App\Http\Controllers\CentroCostoController;
+use App\Http\Controllers\DireccionController;
+use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\GerenciaController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PuestoController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UnidadNegocioController;
+use App\Http\Controllers\UserController;
 use App\Models\Area;
+use App\Models\CentroCosto;
 use App\Models\Direccion;
 use App\Models\Division;
 use App\Models\Empleado;
@@ -38,6 +40,7 @@ Route::get('/dashboard', function () {
         'permisos' => Permission::count(),
         'divisiones' => Division::count(),
         'unidades_negocio' => UnidadNegocio::count(),
+        'centros_costos' => CentroCosto::count(),
         'direcciones' => Direccion::count(),
         'gerencias' => Gerencia::count(),
         'areas' => Area::count(),
@@ -76,7 +79,21 @@ Route::middleware('auth')->group(function () {
             'unidadesNegocio.direcciones.areas.puestos',
         ])->orderBy('nombre')->get();
 
-        return view('estructura-organizacional', compact('divisiones'));
+        $centrosTodos = CentroCosto::with('areas.direccion')->where('activo', true)->get();
+        $centrosPorUnidad = [];
+        foreach ($centrosTodos as $cc) {
+            foreach ($cc->areas as $area) {
+                $uid = $area->direccion->unidad_negocio_id;
+                $centrosPorUnidad[$uid] ??= [];
+                $centrosPorUnidad[$uid][$cc->id] = $cc;
+            }
+        }
+        foreach ($centrosPorUnidad as $uid => $map) {
+            $centrosPorUnidad[$uid] = array_values($map);
+        }
+        $centrosCostoTotal = $centrosTodos->count();
+
+        return view('estructura-organizacional', compact('divisiones', 'centrosPorUnidad', 'centrosCostoTotal'));
     })->name('estructura-organizacional');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -95,6 +112,7 @@ Route::middleware('auth')->group(function () {
     // Catálogos - Estructura Organizacional (relación: División → Unidad de Negocio → Dirección → Gerencia → Área → Puesto)
     Route::resource('divisiones', DivisionController::class)->parameters(['divisiones' => 'divisione']);
     Route::resource('unidades-negocio', UnidadNegocioController::class)->parameters(['unidades-negocio' => 'unidadNegocio']);
+    Route::resource('centros-costos', CentroCostoController::class)->parameters(['centros-costos' => 'centroCosto']);
     Route::resource('direcciones', DireccionController::class)->parameters(['direcciones' => 'direccione']);
     Route::resource('gerencias', GerenciaController::class);
     Route::resource('areas', AreaController::class);

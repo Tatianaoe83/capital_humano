@@ -6,9 +6,7 @@
                 <!-- Logo -->
                 <a href="{{ route('dashboard') }}" class="shrink-0 flex items-center gap-2 group">
                     <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-colors">
-                        <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
+                       <img src="{{ asset('img/logo.png') }}" alt="Logo" class="h-10 w-10 object-contain">
                     </div>
                     <span class="font-bold text-white text-lg hidden sm:inline">Capital Humano</span>
                 </a>
